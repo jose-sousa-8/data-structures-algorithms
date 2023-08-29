@@ -49,9 +49,9 @@ func (ll *LinkedList[T]) prepend(value T) {
 	ll.length++
 }
 
-func (ll *LinkedList[T]) get(index int) (*Node[T], error) {
+func (ll *LinkedList[T]) get(index int) *Node[T] {
 	if index < 0 || index >= ll.length {
-		return &Node[T]{}, fmt.Errorf("index out of bounnds")
+		return nil
 	}
 
 	counter := 0
@@ -61,30 +61,27 @@ func (ll *LinkedList[T]) get(index int) (*Node[T], error) {
 		counter++
 	}
 
-	return tmp, nil
+	return tmp
 }
 
 func (ll *LinkedList[T]) set(value T, index int) bool {
-	node, err := ll.get(index)
-	if err != nil {
-		return false
-	}
+	node := ll.get(index)
 	node.value = value
 	return true
 }
 
 func (ll *LinkedList[T]) insert(value T, index int) bool {
-	if index < 0 || index >= ll.length {
+	if index < 0 || index > ll.length {
 		return false
 	}
 
 	if index == 0 {
 		ll.prepend(value)
-	} else if index == ll.length {
+	} else if index == ll.length-1 {
 		ll.append(value)
 	} else {
 		newNode := createNode[T](value)
-		tmp, _ := ll.get(index - 1)
+		tmp := ll.get(index - 1)
 		newNode.next = tmp.next
 		tmp.next = newNode
 		ll.length++
@@ -144,7 +141,7 @@ func (ll *LinkedList[T]) deleteNode(index int) {
 	} else if index == ll.length-1 {
 		ll.deleteLast()
 	} else {
-		previous, _ := ll.get(index - 1)
+		previous := ll.get(index - 1)
 		tmp := previous.next
 		previous.next = tmp.next
 		ll.length--
@@ -165,58 +162,24 @@ func (ll *LinkedList[T]) reverse() {
 	}
 }
 
+func (ll *LinkedList[T]) findMiddleNode() *Node[T] {
+	fast := ll.head
+	slow := ll.head
+
+	for fast != nil && fast.next != nil {
+		slow = slow.next
+		fast = fast.next.next
+	}
+
+	// When the loop ends, slow points to the middle
+	return slow
+}
+
 func main() {
 	var linkedList = createLinkedList[int](1)
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-
-	linkedList.append(5)
-	linkedList.append(8)
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-
-	linkedList.deleteLast()
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-
-	linkedList.prepend(8)
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-
-	linkedList.deleteFirst()
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-
-	fmt.Println(linkedList.get(1))
-	fmt.Println(linkedList.get(2))
-	fmt.Println(linkedList.get(0))
-
-	fmt.Println("-----------")
-
-	linkedList.set(10, 0)
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-
-	linkedList.insert(7, 1)
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-	linkedList.deleteNode(1)
-	printLinkedList[int](linkedList)
-
-	fmt.Println("-----------")
-	linkedList.append(1)
 	linkedList.append(2)
 	linkedList.append(3)
 	linkedList.append(4)
-	printLinkedList[int](linkedList)
-	fmt.Println("-----------")
-	linkedList.reverse()
-	printLinkedList[int](linkedList)
+	linkedList.append(5)
+	fmt.Println(linkedList.findMiddleNode().value)
 }
