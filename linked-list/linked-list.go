@@ -162,6 +162,18 @@ func (ll *LinkedList[T]) reverse() {
 	}
 }
 
+// Initialize two pointers, slow and fast, both pointing to the head of the linked list.
+// Traverse the linked list using a while loop.
+// The loop continues as long as fast is not nullptr (i.e., it has not reached the end of the list),
+// and fast->next is also not nullptr (i.e., there is at least one more node after the current fast node).
+// Inside the loop, move the slow pointer one step forward (i.e., slow = slow->next)
+// and the fast pointer two steps forward (i.e., fast = fast->next->next).
+// Since the fast pointer moves twice as fast as the slow pointer,
+// by the time the fast pointer reaches the end of the list or goes beyond it, the slow pointer will be at the middle node.
+// When the loop terminates, return the slow pointer, which now points to the middle node.
+// In the case of an even number of nodes, the fast pointer will reach the end of the list,
+// while the slow pointer will point to the first middle node (the one closer to the head).
+// For an odd number of nodes, the fast pointer will go beyond the end of the list, and the slow pointer will point to the exact middle node.
 func (ll *LinkedList[T]) findMiddleNode() *Node[T] {
 	fast := ll.head
 	slow := ll.head
@@ -175,11 +187,74 @@ func (ll *LinkedList[T]) findMiddleNode() *Node[T] {
 	return slow
 }
 
+// Initialize the slow and fast pointers to the head of the linked list.
+// Start a while loop that continues as long as the fast pointer is not null and the next node of the fast pointer is not null.
+// The loop will break if either of these conditions is false, indicating that the end of the list has been reached,
+// and thus there is no loop.
+// Inside the loop, move the slow pointer one step forward (to the next node)
+// and the fast pointer two steps forward (to the next-to-next node).
+// Check if the slow pointer is equal to the fast pointer.
+// If they are equal, it means the pointers have met inside the loop, so a loop exists in the linked list.
+// In this case, return true.
+// If the while loop completes without the pointers meeting, it means there is no loop in the list.
+// In this case, return false.
+// This algorithm has a time complexity of O(n) and a space complexity of O(1),
+//  making it an efficient way to detect loops in a linked list.
+
+func (ll *LinkedList[T]) hasLoop() bool {
+	if ll.head == nil {
+		return false
+	}
+
+	slow := ll.head
+	fast := ll.head.next
+	for slow != fast {
+		if fast == nil || fast.next == nil {
+			return false
+		}
+		slow = slow.next
+		fast = fast.next.next
+	}
+	return true
+}
+
+// Initialize two pointers, slow and fast, both pointing to the head of the list.
+// Move the fast pointer k steps ahead in the list.
+// 	For each step from 0 to k-1, perform the following:
+// 		If the fast pointer is nullptr, return nullptr (k is larger than the list size).
+// 		Move the fast pointer to the next node.
+
+// Traverse the list with both slow and fast pointers until the fast pointer reaches the end.
+//
+//	While the fast pointer is not nullptr, perform the following:
+//		Move the slow pointer to the next node.
+//		Move the fast pointer to the next node.
+//
+// Return the slow pointer, which is now at the kth node from the end of the list.
+func (ll *LinkedList[T]) findKthFromEnd(k int) *Node[T] {
+	slow := ll.head
+	fast := ll.head
+
+	for i := 0; i < k; i++ {
+		if fast == nil {
+			return nil
+		}
+		fast = fast.next
+	}
+
+	for fast != nil {
+		slow = slow.next
+		fast = fast.next
+	}
+
+	return slow
+}
+
 func main() {
 	var linkedList = createLinkedList[int](1)
 	linkedList.append(2)
 	linkedList.append(3)
 	linkedList.append(4)
 	linkedList.append(5)
-	fmt.Println(linkedList.findMiddleNode().value)
+	fmt.Println(linkedList.findKthFromEnd(2))
 }
