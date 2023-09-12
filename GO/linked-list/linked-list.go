@@ -9,7 +9,7 @@ type Node[T any] struct {
 	next  *Node[T]
 }
 
-type LinkedList[T any] struct {
+type LinkedList[T comparable] struct {
 	head   *Node[T]
 	tail   *Node[T]
 	length int
@@ -19,7 +19,7 @@ func createNode[T any](value T) *Node[T] {
 	return &Node[T]{value: value, next: nil}
 }
 
-func createLinkedList[T any](value T) *LinkedList[T] {
+func createLinkedList[T comparable](value T) *LinkedList[T] {
 	node := createNode[T](value)
 	return &LinkedList[T]{head: node, tail: node, length: 1}
 }
@@ -123,7 +123,7 @@ func (ll *LinkedList[T]) deleteFirst() {
 	ll.length--
 }
 
-func printLinkedList[T any](linkedList *LinkedList[T]) {
+func printLinkedList[T comparable](linkedList *LinkedList[T]) {
 	node := linkedList.head
 	for node != nil {
 		fmt.Println(node.value)
@@ -250,11 +250,63 @@ func (ll *LinkedList[T]) findKthFromEnd(k int) *Node[T] {
 	return slow
 }
 
+func (ll *LinkedList[T]) removeDuplicates() {
+	if ll.length == 0 || ll.length == 1 {
+		return
+	}
+
+	m := map[T]bool{}
+
+	previous := &Node[T]{}
+	current := ll.head
+	for current != nil {
+		if m[current.value] {
+			previous.next = current.next
+			current = previous.next
+			ll.length -= 1
+		} else {
+			m[current.value] = true
+			previous = current
+			current = current.next
+		}
+	}
+}
+
+func (ll *LinkedList[T]) reverseBetween(m, n int) {
+	if ll.head == nil {
+		return
+	}
+
+	var d T
+	dummy := createNode(d)
+	dummy.next = ll.head
+	prev := dummy
+
+	for i := 0; i < m; i++ {
+		prev = prev.next
+	}
+
+	current := prev.next
+	for i := 0; i < n-m; i++ {
+		temp := current.next
+		current.next = temp.next
+		temp.next = prev.next
+		prev.next = temp
+	}
+
+	ll.head = dummy.next
+}
+
 func main() {
 	var linkedList = createLinkedList[int](1)
 	linkedList.append(2)
+	linkedList.append(2)
+	linkedList.append(3)
 	linkedList.append(3)
 	linkedList.append(4)
 	linkedList.append(5)
-	fmt.Println(linkedList.findKthFromEnd(2))
+	linkedList.removeDuplicates()
+	printLinkedList(linkedList)
+	linkedList.reverseBetween(0, 1)
+	printLinkedList(linkedList)
 }
